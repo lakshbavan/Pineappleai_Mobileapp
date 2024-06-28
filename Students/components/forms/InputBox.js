@@ -1,20 +1,26 @@
 import { View, Text, StyleSheet, TextInput } from 'react-native'
 import React from 'react'
 
-const InputBox = ({inputTittle, keyboardType, autoComplete,secureTextEntry= false,value, setValue}) => {
+const InputBox = ({
+    inputTitle,
+    autoComplete,
+    keyboardType,
+    secureTextEntry,
+    value,
+    setValue
+}) => {
   return (
     <View>
-        <Text>{inputTittle}</Text>
-        <TextInput 
+      <Text>{inputTitle}</Text>
+      <TextInput 
         style={styles.inputBox}
         autoCorrect={false}
         keyboardType={keyboardType}
         autoComplete={autoComplete}
-        secureTextEntry={secureTextEntry}
+        secureTextEntry={secureTextEntry} 
         value={value}
         onChangeText={(text) => setValue(text)}
         />
-       
     </View>
   )
 }
@@ -26,8 +32,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#ffffff",
         borderRadius: 10,
         marginTop: 10,
+        paddingLeft: 10,
+        color: "#af9f85",
     },
-
-})
+});
 
 export default InputBox

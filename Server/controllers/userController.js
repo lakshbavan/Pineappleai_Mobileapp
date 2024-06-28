@@ -1,6 +1,14 @@
 const JWT = require('jsonwebtoken')
 const { hashpassword, comparePassword } = require('../helpers/authHelper');
 const userModel = require('../models/userModel')
+var { expressjwt: jwt } = require("express-jwt");
+
+
+//middleware
+const requireSignIn = jwt({
+    secret: process.env.JWT_SECRET ,
+    algorithms: ["HS256"],
+});
 
 
 //Register
@@ -11,19 +19,19 @@ const registerController = async(req,res) => {
         if(!name){
             return res.status(400).send({
                 success: false,
-                massage:'name is required'
+                message:'name is required'
             })
         }
         if(!email){
             return res.status(400).send({
                 success: false,
-                massage:'email is required'
+                message:'email is required'
             })
         }
         if(!password || password.length < 6){
             return res.status(400).send({
                 success: false,
-                massage:'password is required and 6 character long'
+                message:'password is required and 6 character long'
             })
         }
         //exisiting user
@@ -106,5 +114,40 @@ const loginController = async (req,res) => {
     }
 };
 
+//Update user
+const updateUserController = async (req,res) => {
+    try {
+        const {name,password,email} = req.body
+        //user find
+        const user = await userModel.findOne({email})
+        //password validate
+        if (password && password.length < 6) {
+            return res.status(400).send({
+                success: false,
+                message:'password is required and should be 6 character long'
+            })
+        }
+        const hashedPassword = password ? await hashpassword(password) : undefined
+        //updated user
+        const updatedUser = await userModel.findOneAndUpdate({email}, {
+            name: name || user.name ,
+            password: hashedPassword || user.password
+        }, {new:true})
+        user.undefined;
+        res.status(200).send({
+            success: true,
+            message: 'Profile Update Please Login',
+            updatedUser
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            success:false,
+            message: 'error in user update api',
+            error,
+        })
+    }
+};
 
-module.exports = { registerController, loginController };
+
+module.exports = {requireSignIn, registerController, loginController, updateUserController };
